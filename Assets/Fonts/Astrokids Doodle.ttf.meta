@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 72ec3053bafbfb74d857e9ece9852020
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Astrokids Doodle
+  fontNames:
+  - Astrokids Doodle
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 2eb0748c68a165d46977660a66be3e46, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
