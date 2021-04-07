@@ -7,11 +7,11 @@ public class PlayerCharacter : Character
 {
     public Text lifeText;
     public Text nbMunitions;
-    public GameManager gameManager;
     public GameObject pauseMenu;
 
     void Start()
     {
+        gameManager = GameObject.FindGameObjectWithTag("gameManager").GetComponent<GameManager>();
         slingshot = GameObject.FindGameObjectWithTag("slingshot").GetComponent<Transform>();
         animator = GetComponent<Animator>();
     }
@@ -46,7 +46,7 @@ public class PlayerCharacter : Character
 
     public void Shoot()
     {
-        if (pauseMenu.GetComponent<PauseManager>().gamePaused == false) //empecher tir
+        if (!pauseMenu.GetComponent<PauseManager>().gamePaused) //empecher tir
         {
             base.Shoot("player");
         }
@@ -58,25 +58,8 @@ public class PlayerCharacter : Character
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        if (horizontal < 0f)
-        {
-            transform.position = transform.position + new Vector3(horizontal * Time.deltaTime * speed, 0f, 0f);
-        }
-        if (horizontal > 0f)
-        {
-            transform.position = transform.position + new Vector3(horizontal * Time.deltaTime * speed, 0f, 0f);
-        }
-
-        if (vertical < 0f)
-        {
-            transform.position = transform.position + new Vector3(0f, vertical * Time.deltaTime * speed, 0f);
-        }
-        if (vertical > 0f)
-        {
-            transform.position = transform.position + new Vector3(0f, vertical * Time.deltaTime * speed, 0f);
-        }
-
-        transform.position = transform.position + new Vector3(horizontal * Time.deltaTime * speed, 0f, 0f);
+        Vector3 velocity = new Vector3(horizontal, vertical, 0f).normalized * Time.deltaTime * speed;
+        transform.position += velocity;
     }
 
     public override void SlingshotOrientation()

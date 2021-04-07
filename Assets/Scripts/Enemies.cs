@@ -15,13 +15,13 @@ public class Enemies : Character
     private int nbVague; //vague d'apparition
 
     public Vector3 stonePos; //position où faire apparaître le joueur
-    public bool checkSeek = false;
+    public bool isSeeking = false;
     public float timerShoot;
     public float initTimer = 9f;
-    public float timerATK = 0;
+    public float timerAttack = 0;
     public Vector3 startPosition;
     public float startTime;
-    float distSeek;
+    float distanceWithStone;
     float parcours;
 
     // Start is called before the first frame update
@@ -29,11 +29,14 @@ public class Enemies : Character
     {
         lifes = 1;
         timerShoot = UnityEngine.Random.Range(1f, initTimer);
+
+        gameManager = GameObject.FindGameObjectWithTag("gameManager").GetComponent<GameManager>();
         limits = GameObject.FindGameObjectWithTag("limits");
-        player = GameObject.Find("Player");
-        spawn = GameObject.Find("Spawn Enemies");
+        player = GameObject.FindGameObjectWithTag("Player");
+        spawn = GameObject.FindGameObjectWithTag("spawn");
         stonePos = new Vector3(0, 0, 0);
-        nbVague = spawn.GetComponent<Spawn>().nbVague;
+        nbVague = spawn.GetComponent<Spawn>().nbWave;
+
         if (nbVague >= 3)
         {
             munitions = 1; // les rend plus dynamiques
@@ -53,7 +56,6 @@ public class Enemies : Character
         animator.SetTrigger(couleur);
     }
 
-    // Update is called once per frame
     void Update()
     {
         SlingshotOrientation();
@@ -80,34 +82,34 @@ public class Enemies : Character
     {
         if (distance < 2f)
         {
-            timerATK += 1 * Time.deltaTime;
+            timerAttack += 1 * Time.deltaTime;
 
-            if (timerATK >= 1f && player != null)
+            if (timerAttack >= 1f && player != null)
             {
                 player.GetComponent<PlayerCharacter>().TakeDamages();
-                timerATK = 0;
+                timerAttack = 0;
             }
         }
     }
 
     public GameObject FindClosestStone()
     {
-        GameObject[] tab;
-        tab = GameObject.FindGameObjectsWithTag("stone"); //si collectable!!
+        GameObject[] allStones;
+        allStones = gameManager.stonesList.ToArray(); //si collectable!!
         GameObject closest = null;
-        float distance = Mathf.Infinity;
-        Vector3 position = transform.position;
+        float previousDistance = Mathf.Infinity;
+        Vector3 myPosition = transform.position;
 
-        for (int i = 0; i < tab.Length; i++)
+        for (int i = 0; i < allStones.Length; i++)
         {
-            if (tab[i].GetComponent<Stone>().collectable == true) { 
+            if (allStones[i].GetComponent<Stone>().collectable) { 
 
-                Vector3 diff = tab[i].transform.position - position;
-                float curDistance = diff.sqrMagnitude;
-                if (curDistance < distance)
+                Vector3 diff = allStones[i].transform.position - myPosition;
+                float currentDistance = diff.sqrMagnitude;
+                if (currentDistance < previousDistance)
                 {
-                    closest = tab[i];
-                    distance = curDistance;
+                    closest = allStones[i];
+                    previousDistance = currentDistance;
                 }
             }
         }
@@ -116,17 +118,17 @@ public class Enemies : Character
 
     public void FindStone()
     {
-        if (!checkSeek && FindClosestStone() != null)
+        if (!isSeeking && FindClosestStone() != null)
         {
             //find a stone
             startTime = Time.time;
             startPosition = transform.position;
             stonePos = FindClosestStone().transform.position; 
-            distSeek = Vector3.Distance(startPosition, stonePos); //distance avec la cible
-            checkSeek = true;
+            distanceWithStone = Vector3.Distance(startPosition, stonePos); //distance avec la cible
+            isSeeking = true;
         }
 
-        parcours = ((Time.time - startTime) * speed)/distSeek;
+        parcours = ((Time.time - startTime) * speed)/distanceWithStone;
         transform.position = Vector3.Lerp(startPosition, stonePos, parcours);
 
     }
@@ -137,7 +139,7 @@ public class Enemies : Character
         base.PickUp();
 
         stonePos = new Vector3(0, 0, 0);
-        checkSeek = false;
+        isSeeking = false;
     }
 
     public override void TakeDamages()

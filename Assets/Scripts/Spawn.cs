@@ -5,19 +5,19 @@ using UnityEngine.UI;
 
 public class Spawn : MonoBehaviour
 {
-    public GameObject Enemies;
-    public GameObject Player;
+    public GameObject enemy;
+    public GameObject player;
     public bool moreLife;
     int nbWavesBeforeNewLife = 1;
-    public float initTimerNmi;
-    private float timerNmi;
-    public int nbVague = 0;
-    public int nbNmi = 0;
+    public float initTimerEnemy;
+    private float timerEnemy;
+    public int nbWave = 0;
+    public int nbEnemies = 0;
     public int moreNmiEachWave;
-    public int maxNmiV; //d'une vague
-    public int maxNmi; //global
-    public float timeBetweenWaves;
-    private float initTimeBetweenWaves;
+    public int numberEnemiesThisWave; //d'une vague
+    public int maxNumberEnemy; //global
+    public float initTimeBetweenWaves;
+    private float timeBetweenWaves;
     public bool wave;
     private bool checkNextWave = false;
     public Text waveTxt;
@@ -25,13 +25,13 @@ public class Spawn : MonoBehaviour
 
     void Start()
     {
-        initTimeBetweenWaves = timeBetweenWaves;
-        timerNmi = initTimerNmi;    //frequence ennemis
+        timerEnemy = initTimerEnemy;    //frequence ennemis
+        timeBetweenWaves = initTimeBetweenWaves;    //pause entre les vagues
     }
 
     void Update()
     {
-        waveTxt.text = "Wave : " + nbVague;
+        waveTxt.text = "Wave : " + nbWave;
 
 
         if (GameObject.FindGameObjectsWithTag("enemy").Length == 0 && !checkNextWave)
@@ -39,8 +39,8 @@ public class Spawn : MonoBehaviour
             if (timeBetweenWaves <= 0){
                 // vague suivante;
                 wave = true;
-                nbNmi = 0;
-                nbVague += 1;
+                nbEnemies = 0;
+                nbWave += 1;
                 nbWavesBeforeNewLife += 1;
                 checkNextWave = true;
                 timeBetweenWaves = initTimeBetweenWaves;
@@ -54,44 +54,45 @@ public class Spawn : MonoBehaviour
         if (nbWavesBeforeNewLife == 5)
         {
             //au bout de 5 niveaux, récupérer une vie
-            Player.GetComponent<PlayerCharacter>().lifes += 1;
+            player.GetComponent<PlayerCharacter>().lifes += 1;
             nbWavesBeforeNewLife = 0;
         }
 
-        if (timerNmi > 0)
+        if (timerEnemy > 0)
         {
-            timerNmi = timerNmi - Time.deltaTime;
+            timerEnemy = timerEnemy - Time.deltaTime;
         }//timer entre spawn
-        else if (wave && nbNmi < maxNmiV)
+        else if (wave && nbEnemies < numberEnemiesThisWave)
         {
             // spawn
             checkNextWave = false;
-            string hColor;
+            string hairColor;
 
             if (Random.Range(1,3) == 1)
             {
-                hColor = "brun";
+                hairColor = "brun";
             }
             else if (Random.Range(1,3) == 2)
             {
-                hColor = "noir";
+                hairColor = "noir";
             }
             else
             {
-                hColor = "blond";
+                hairColor = "blond";
             }
 
-            nbNmi += 1;
-            timerNmi = initTimerNmi;
-            GameObject nmi;
-            nmi = GameObject.Instantiate(Enemies, new Vector3(UnityEngine.Random.Range(-7.5f,7.5f),10f,0f),Quaternion.identity);
-            nmi.name = "Enemy n°" + nbNmi;
-            nmi.GetComponent<Enemies>().SetColor(hColor);
+            nbEnemies += 1;
+            timerEnemy = initTimerEnemy;
 
+            GameObject newEnemy;
+            newEnemy = GameObject.Instantiate(enemy, new Vector3(UnityEngine.Random.Range(-7.5f,7.5f),10f,0f),Quaternion.identity);
+            newEnemy.name = "Enemy n°" + nbEnemies;
+            newEnemy.GetComponent<Enemies>().SetColor(hairColor);
+            newEnemy.transform.parent = transform; //set spawner as parent
 
-            if (nbVague >= 14)
+            if (nbWave >= 14)
             {
-                initTimerNmi = 0.25f;
+                initTimerEnemy = 0.25f;
             }
 
         }//générer vague
@@ -99,8 +100,8 @@ public class Spawn : MonoBehaviour
         else if (wave)
         {
             wave = false;
-            if (maxNmiV+1 <= maxNmi) {
-                maxNmiV += moreNmiEachWave;
+            if (numberEnemiesThisWave+1 <= maxNumberEnemy) {
+                numberEnemiesThisWave += moreNmiEachWave;
             }
         } //fin vague
 

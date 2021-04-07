@@ -7,35 +7,21 @@ public class Stone : MonoBehaviour
     public bool collectable = false;
     public string thrower;
     public float speed;
-    public bool type;
     private Vector3 direction;
-    public bool up;
-    public bool shootDown;
     public GameManager gameManager;
     public float sDistance; //distance avant arrêt
-    public Vector3 nmiPos;
+    public Vector3 enemyPosition;
     public float nDistance; //distance entre caillou et ennemi
 
     void Start()
     {
         collectable = false;
-        gameManager = GameObject.FindGameObjectWithTag("gameManager").GetComponent<GameManager>();
-    }
-
-    public void CollectableOrNot(bool na, string throwerOrigin)
-    {
-        type = na; //inutile?
-        thrower = throwerOrigin;
-    }
-
-    public void ShootDir(bool UpOrDown)
-    {
-        shootDown = UpOrDown;
+        //gameManager = GameObject.FindGameObjectWithTag("gameManager").GetComponent<GameManager>();
     }
 
     private void Update()
     {
-        nDistance = Vector3.Distance(nmiPos, transform.position);
+        nDistance = Vector3.Distance(enemyPosition, transform.position);
 
         if (!collectable)
         {
@@ -52,56 +38,62 @@ public class Stone : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (collectable)
-        {
-          //ramassé
-            if (col.gameObject.name == "Player" && col.gameObject.GetComponent<PlayerCharacter>().munitions < col.gameObject.GetComponent<PlayerCharacter>().maxMunitions)
-            {
-                SoundManager.PlaySound("PickStone");
-                col.gameObject.GetComponent<PlayerCharacter>().PickUp();
-                GameObject.Destroy(this.gameObject);
+        Character child;
 
-            }
-            if (col.gameObject.name.Contains("Enemy") && col.gameObject.GetComponent<Enemies>().munitions < col.gameObject.GetComponent<Enemies>().maxMunitions)
-            {
-                col.gameObject.GetComponent<Enemies>().PickUp();
-                GameObject.Destroy(this.gameObject);
-            }
-        }
-
-        else if (!collectable)
+        if (col.gameObject.TryGetComponent<Character>(out child))
         {
-            //dégâts
-            if (col.gameObject.tag == "Player" && thrower != "player")
+            if (collectable)
             {
-                col.gameObject.GetComponent<PlayerCharacter>().TakeDamages();
-                collectable = true;
+                //ramassé
+                if (col.gameObject.name == "Player" && child.munitions < child.maxMunitions)
+                {
+                    SoundManager.PlaySound("PickStone");
+                    col.gameObject.GetComponent<PlayerCharacter>().PickUp();
+                    gameManager.stonesList.Remove(gameObject);
+                    GameObject.Destroy(gameObject);
+
+                }
+                if (col.gameObject.name.Contains("Enemy") && child.munitions < child.maxMunitions)
+                {
+                    col.gameObject.GetComponent<Enemies>().PickUp();
+                    gameManager.stonesList.Remove(gameObject);
+                    GameObject.Destroy(gameObject);
+                }
             }
-            if (col.gameObject.tag == "enemy" && thrower != "enemy")
+
+            else if (!collectable)
             {
-                col.gameObject.GetComponent<Enemies>().TakeDamages();
-                collectable = true;
-                gameManager.score += 1;
+                //dégâts
+                if (col.gameObject.tag == "Player" && thrower != "player")
+                {
+                    col.gameObject.GetComponent<PlayerCharacter>().TakeDamages();
+                    collectable = true;
+                }
+                if (col.gameObject.tag == "enemy" && thrower != "enemy")
+                {
+                    col.gameObject.GetComponent<Enemies>().TakeDamages();
+                    collectable = true;
+                    gameManager.score += 1;
+                }
             }
         }
 
         if (col.gameObject.tag == "bord")
         {
             collectable = true;
-        }
-
-
+        }   
     }
 
     public void Throw(Vector3 dir, string currentThrower)
     {
         direction = dir;
         thrower = currentThrower;
+        gameManager = GameObject.FindGameObjectWithTag("gameManager").GetComponent<GameManager>();
     }
 
     public void StopDistance(float didi, Vector3 nmiP)
     {
         sDistance = Random.Range(didi, 15f);
-        nmiPos = nmiP;
+        enemyPosition = nmiP;
     }
 }

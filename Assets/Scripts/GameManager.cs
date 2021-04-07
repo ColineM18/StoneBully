@@ -14,8 +14,8 @@ public class GameManager : MonoBehaviour
     public string mapToLoad;
     public float replayTimer;
     public PauseManager pause;
+    public List<GameObject> stonesList = new List<GameObject>();
 
-    
     void Start()
     {
         Time.timeScale = 1; //éviter problème de reload

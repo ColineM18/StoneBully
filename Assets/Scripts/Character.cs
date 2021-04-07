@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
+    public GameManager gameManager;
     public GameObject stone;
     public float distance;
     public int munitions;
     public int maxMunitions;
-    protected bool checkShoot = false;
     public int lifes;
     public string thrower; //lanceur
     public Camera mainCamera;
@@ -21,21 +21,8 @@ public class Character : MonoBehaviour
     public GameObject startSlingshot; //position lance-pierre
     public Animator animator;
 
-    public Character() : base()
-    {
-
-    }
+    public Character() : base()   { }
     
-    void Start()
-    {
-        munitions = 3;
-        maxMunitions = 3;
-    }
-    
-    void Update()
-    {
-        Move();
-    }
 
     public virtual void PickUp()
     {
@@ -68,11 +55,12 @@ public class Character : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && !shoot && player.gameObject.GetComponent<PlayerCharacter>().munitions > 0 && shooter == "player" || shooter == "enemy" && this.gameObject.GetComponent<Enemies>().munitions > 0)
         {
             //si assez de munitions, lancer caillou
-            GameObject stoneThrown;
+            Stone stoneThrown;
 
-            stoneThrown = GameObject.Instantiate(stone, transform.GetChild(0).transform.position, Quaternion.identity);
-
-            stoneThrown.GetComponent<Stone>().Throw(new Vector3(shootDirection.x * Time.deltaTime, shootDirection.y * Time.deltaTime, 0), thrower);
+            stoneThrown = GameObject.Instantiate(stone, transform.GetChild(0).transform.position, Quaternion.identity).GetComponent<Stone>();
+            stoneThrown.Throw(new Vector3(shootDirection.x * Time.deltaTime, shootDirection.y * Time.deltaTime, 0), thrower);
+            stoneThrown.transform.parent = gameManager.transform;
+            gameManager.stonesList.Add(stoneThrown.gameObject);          
 
             SoundManager.PlaySound("Fire");
 
