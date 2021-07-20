@@ -7,13 +7,12 @@ public class PlayerCharacter : Character
 {
     public Text lifeText;
     public Text nbMunitions;
-    public GameObject pauseMenu;
+    public PauseManager pauseMenu;
 
     void Start()
     {
-        gameManager = GameObject.FindGameObjectWithTag("gameManager").GetComponent<GameManager>();
-        slingshot = GameObject.FindGameObjectWithTag("slingshot").GetComponent<Transform>();
-        animator = GetComponent<Animator>();
+        gameManager = GameManager.instance;
+        slingshot = gameManager.slingshot;
     }
 
     void Update()
@@ -44,11 +43,36 @@ public class PlayerCharacter : Character
         }
     }
 
-    public void Shoot()
+    public override void Shoot()
     {
-        if (!pauseMenu.GetComponent<PauseManager>().gamePaused) //empecher tir
+        if (!pauseMenu.gamePaused) //empecher tir
         {
-            base.Shoot("player");
+            //shoot in mouse direction
+            mouseDirection = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));
+            mouseDirection -= transform.position;
+            shootDirection = mouseDirection;
+            
+
+            if (Input.GetMouseButtonDown(0) && !shoot && munitions > 0)
+            {
+                //si assez de munitions, lancer caillou
+                Stone stoneThrown;
+
+                stoneThrown = Instantiate(stone, transform.GetChild(0).transform.position, Quaternion.identity).GetComponent<Stone>();
+                stoneThrown.Throw(new Vector3(shootDirection.x * Time.deltaTime, shootDirection.y * Time.deltaTime, 0), thrower);
+                stoneThrown.transform.parent = gameManager.transform;
+                gameManager.stonesList.Add(stoneThrown);
+
+                //shoot
+                munitions -= 1;
+                animator.SetTrigger("Shoot");
+                SoundManager.PlaySound("Fire");
+                shoot = true;
+            }
+            else
+            {
+                shoot = false;
+            }
         }
     }
 
@@ -64,7 +88,7 @@ public class PlayerCharacter : Character
 
     public override void SlingshotOrientation()
     {
-        if (!pauseMenu.GetComponent<PauseManager>().gamePaused)
+        if (!pauseMenu.gamePaused)
             base.SlingshotOrientation();
     }
 }

@@ -12,7 +12,7 @@ public class Character : MonoBehaviour
     public int lifes;
     public string thrower; //lanceur
     public Camera mainCamera;
-    public GameObject player;
+    public PlayerCharacter player;
     public float speed = 1;
     public Vector3 mouseDirection;
     public Vector3 shootDirection;
@@ -37,51 +37,9 @@ public class Character : MonoBehaviour
     }
 
     //Manage shoot
-    public virtual void Shoot(string shooter)
+    public virtual void Shoot()
     {
-        if (shooter == "player")
-        {
-                //shoot in mouse direction
-                mouseDirection = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));
-                mouseDirection -= transform.position;
-                shootDirection = mouseDirection;
-        }
-        else if (player != null)
-        {
-            //shoot in player direction (enemy)
-                shootDirection = player.transform.position - transform.position;
-        }
 
-        if (Input.GetMouseButtonDown(0) && !shoot && player.gameObject.GetComponent<PlayerCharacter>().munitions > 0 && shooter == "player" || shooter == "enemy" && this.gameObject.GetComponent<Enemies>().munitions > 0)
-        {
-            //si assez de munitions, lancer caillou
-            Stone stoneThrown;
-
-            stoneThrown = GameObject.Instantiate(stone, transform.GetChild(0).transform.position, Quaternion.identity).GetComponent<Stone>();
-            stoneThrown.Throw(new Vector3(shootDirection.x * Time.deltaTime, shootDirection.y * Time.deltaTime, 0), thrower);
-            stoneThrown.transform.parent = gameManager.transform;
-            gameManager.stonesList.Add(stoneThrown.gameObject);          
-
-            SoundManager.PlaySound("Fire");
-
-            if (shooter == "player")
-            {
-                //shoot
-                GetComponent<PlayerCharacter>().munitions -= 1;
-                animator.SetTrigger("Shoot");
-            }
-            else
-            {
-                GetComponent<Enemies>().munitions -= 1;
-                stoneThrown.GetComponent<Stone>().StopDistance(distance, transform.position);
-            }
-
-            shoot = true;
-        }
-        else
-        {
-                shoot = false;
-        }
     }
 
     public virtual void Move() { }

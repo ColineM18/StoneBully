@@ -16,7 +16,8 @@ public class Stone : MonoBehaviour
     void Start()
     {
         collectable = false;
-        //gameManager = GameObject.FindGameObjectWithTag("gameManager").GetComponent<GameManager>();
+        gameManager = GameManager.instance;
+
     }
 
     private void Update()
@@ -49,14 +50,14 @@ public class Stone : MonoBehaviour
                 {
                     SoundManager.PlaySound("PickStone");
                     col.gameObject.GetComponent<PlayerCharacter>().PickUp();
-                    gameManager.stonesList.Remove(gameObject);
+                    gameManager.stonesList.Remove(gameObject.GetComponent<Stone>());
                     GameObject.Destroy(gameObject);
 
                 }
                 if (col.gameObject.name.Contains("Enemy") && child.munitions < child.maxMunitions)
                 {
                     col.gameObject.GetComponent<Enemies>().PickUp();
-                    gameManager.stonesList.Remove(gameObject);
+                    gameManager.stonesList.Remove(gameObject.GetComponent<Stone>());
                     GameObject.Destroy(gameObject);
                 }
             }
@@ -88,7 +89,7 @@ public class Stone : MonoBehaviour
     {
         direction = dir;
         thrower = currentThrower;
-        gameManager = GameObject.FindGameObjectWithTag("gameManager").GetComponent<GameManager>();
+  
     }
 
     public void StopDistance(float didi, Vector3 nmiP)

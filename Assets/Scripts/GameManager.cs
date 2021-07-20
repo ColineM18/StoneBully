@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
     public int score = 0;
     public GameObject defeat;
     public GameObject replayBouton;
@@ -14,7 +15,29 @@ public class GameManager : MonoBehaviour
     public string mapToLoad;
     public float replayTimer;
     public PauseManager pause;
-    public List<GameObject> stonesList = new List<GameObject>();
+    public List<Stone> stonesList = new List<Stone>();
+    public GameObject limits;
+    public PlayerCharacter player;
+    public Spawn spawn;
+    public Transform slingshot;
+    public int lengthEnemies;
+    
+    void Awake()
+    {
+        #region  singleton
+        if (instance == null)
+        {
+
+            instance = this;
+            DontDestroyOnLoad(this.gameObject);
+
+        }
+        else
+        {
+            Destroy(this);
+        }
+        #endregion
+    }
 
     void Start()
     {
@@ -41,6 +64,7 @@ public class GameManager : MonoBehaviour
     public void Replay()
     {
         SceneManager.LoadScene(mapToLoad);
+        Destroy(gameObject);
     }
 
 }

@@ -472,6 +472,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 418128593667134965}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &230285913 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 418128595352531671, guid: 6f4017a52e48a6343a625ed633d7b3aa,
+    type: 3}
+  m_PrefabInstance: {fileID: 418128593667134965}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 230285908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b879f370bd7fff4bb1b1f3cf1dbda23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &256980548
 GameObject:
   m_ObjectHideFlags: 0
@@ -771,6 +783,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ea1c236331f12740a794338c3726782, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
   enemy: {fileID: 931258654993778766, guid: 64cace3bc29806743851109e04d18b27, type: 3}
   player: {fileID: 230285908}
   moreLife: 0
@@ -4961,6 +4974,11 @@ MonoBehaviour:
   replayTimer: 1.5
   pause: {fileID: 1481317665}
   stonesList: []
+  limits: {fileID: 1065307895}
+  player: {fileID: 230285913}
+  spawn: {fileID: 299633471}
+  slingshot: {fileID: 418128593667134966}
+  lengthEnemies: 0
 --- !u!4 &1906521427
 Transform:
   m_ObjectHideFlags: 0
@@ -5993,9 +6011,26 @@ PrefabInstance:
         type: 3}
       propertyPath: pauseMenu
       value: 
-      objectReference: {fileID: 1481317661}
+      objectReference: {fileID: 1481317665}
+    - target: {fileID: 418128595352531671, guid: 6f4017a52e48a6343a625ed633d7b3aa,
+        type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 418128593667134967}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6f4017a52e48a6343a625ed633d7b3aa, type: 3}
+--- !u!4 &418128593667134966 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 162220588, guid: 6f4017a52e48a6343a625ed633d7b3aa,
+    type: 3}
+  m_PrefabInstance: {fileID: 418128593667134965}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &418128593667134967 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 2368271093311350383, guid: 6f4017a52e48a6343a625ed633d7b3aa,
+    type: 3}
+  m_PrefabInstance: {fileID: 418128593667134965}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1408255224940402814
 PrefabInstance:
   m_ObjectHideFlags: 0

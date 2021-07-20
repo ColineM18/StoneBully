@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Spawn : MonoBehaviour
 {
+    public GameManager gameManager;
     public GameObject enemy;
     public GameObject player;
     public bool moreLife;
@@ -27,6 +28,7 @@ public class Spawn : MonoBehaviour
     {
         timerEnemy = initTimerEnemy;    //frequence ennemis
         timeBetweenWaves = initTimeBetweenWaves;    //pause entre les vagues
+        gameManager = GameManager.instance;
     }
 
     void Update()
@@ -34,7 +36,7 @@ public class Spawn : MonoBehaviour
         waveTxt.text = "Wave : " + nbWave;
 
 
-        if (GameObject.FindGameObjectsWithTag("enemy").Length == 0 && !checkNextWave)
+        if (gameManager.lengthEnemies == 0 && !checkNextWave)
         {
             if (timeBetweenWaves <= 0){
                 // vague suivante;
@@ -82,6 +84,7 @@ public class Spawn : MonoBehaviour
             }
 
             nbEnemies += 1;
+            gameManager.lengthEnemies += 1;
             timerEnemy = initTimerEnemy;
 
             GameObject newEnemy;
