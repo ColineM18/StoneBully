@@ -97,15 +97,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collectable: 0
-  thrower: 
-  speed: 6
-  type: 0
-  up: 0
-  shootDown: 0
-  gameManager: {fileID: 0}
-  sDistance: 0
-  nmiPos: {x: 0, y: 0, z: 0}
-  nDistance: 0
+  thrower: 0
+  speed: 9
+  enemyPosition: {x: 0, y: 0, z: 0}
+  stopDistance: 0
 --- !u!50 &5683532024523274030
 Rigidbody2D:
   serializedVersion: 4

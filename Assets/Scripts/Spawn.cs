@@ -1,113 +1,129 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEngine.UI;
 using UnityEngine;
-using UnityEngine.UI;
+using System.Linq;
 
 public class Spawn : MonoBehaviour
 {
     public GameManager gameManager;
-    public GameObject enemy;
+    public GameObject enemyPrefab;
     public GameObject player;
-    public bool moreLife;
-    int nbWavesBeforeNewLife = 1;
-    public float initTimerEnemy;
-    private float timerEnemy;
-    public int nbWave = 0;
-    public int nbEnemies = 0;
-    public int moreNmiEachWave;
-    public int numberEnemiesThisWave; //d'une vague
+    public Text waveTxt;
+
+    private Vector3 spawnRange => new Vector3(Random.Range(-7.5f, 7.5f), 10f, 0f);
+
     public int maxNumberEnemy; //global
+    public int nbWavesBetweenNewLife;
+    private int nbWavesBeforeNewLife = 1;
+
+    private float spawnTimeFrequency = 1f;
+    private float spawnTime;
+
+    public int nbEnemiesToAddEachTurn;
+    public int numberEnemiesThisWave;
+    public int nbWave;
+    private int nbEnemies;
+        
     public float initTimeBetweenWaves;
     private float timeBetweenWaves;
-    public bool wave;
-    private bool checkNextWave = false;
-    public Text waveTxt;
-    
+
+    public bool waveStarted;
 
     void Start()
     {
-        timerEnemy = initTimerEnemy;    //frequence ennemis
-        timeBetweenWaves = initTimeBetweenWaves;    //pause entre les vagues
+        spawnTime = spawnTimeFrequency;    //frequency
+        timeBetweenWaves = initTimeBetweenWaves;
         gameManager = GameManager.instance;
     }
 
     void Update()
     {
-        waveTxt.text = "Wave : " + nbWave;
+        if (gameManager.enemiesCount == 0 && !waveStarted)
+            StartWave();
 
+        if(waveStarted)
+            StartSpawn();
+    }
 
-        if (gameManager.lengthEnemies == 0 && !checkNextWave)
+    public void StartWave()
+    {
+        timeBetweenWaves -= Time.deltaTime; //delay
+
+        if (timeBetweenWaves <= 0)
         {
-            if (timeBetweenWaves <= 0){
-                // vague suivante;
-                wave = true;
-                nbEnemies = 0;
-                nbWave += 1;
-                nbWavesBeforeNewLife += 1;
-                checkNextWave = true;
-                timeBetweenWaves = initTimeBetweenWaves;
-            }
-            else
-            {
-                timeBetweenWaves -= Time.deltaTime;
-            }
-        }//lancer vague
+            // Next wave ready
+            waveTxt.text = "Wave : " + nbWave;
 
-        if (nbWavesBeforeNewLife == 5)
+            waveStarted = true;
+            nbEnemies = 0;
+            nbWave++;
+            nbWavesBeforeNewLife++;   
+            timeBetweenWaves = initTimeBetweenWaves; //reset delay
+
+            Heal();
+        }
+    }
+    public void Heal()
+    {
+        if (nbWavesBeforeNewLife == nbWavesBetweenNewLife)
         {
-            //au bout de 5 niveaux, récupérer une vie
-            player.GetComponent<PlayerCharacter>().lifes += 1;
+            //get a bonus life every 5 levels
+            gameManager.player.lifes += 1;
             nbWavesBeforeNewLife = 0;
         }
+    }
 
-        if (timerEnemy > 0)
+    public void StartSpawn()
+    {
+        spawnTime -= Time.deltaTime; //delay between spawns
+
+        if (spawnTime <= 0)
         {
-            timerEnemy = timerEnemy - Time.deltaTime;
-        }//timer entre spawn
-        else if (wave && nbEnemies < numberEnemiesThisWave)
-        {
-            // spawn
-            checkNextWave = false;
-            string hairColor;
-
-            if (Random.Range(1,3) == 1)
+            if(nbEnemies < numberEnemiesThisWave)
             {
-                hairColor = "brun";
+                spawnTime = spawnTimeFrequency;
+
+                nbEnemies++;
+                gameManager.enemiesCount++;
+
+                SpawnEnemy();
+
+                if (nbWave >= 14)
+                    spawnTimeFrequency = 0.25f; //increase difficulty
             }
-            else if (Random.Range(1,3) == 2)
+            else //end wave
             {
-                hairColor = "noir";
+                waveStarted = false;
+                if (numberEnemiesThisWave < maxNumberEnemy)
+                    numberEnemiesThisWave += nbEnemiesToAddEachTurn;
             }
-            else
-            {
-                hairColor = "blond";
-            }
+        } 
 
-            nbEnemies += 1;
-            gameManager.lengthEnemies += 1;
-            timerEnemy = initTimerEnemy;
+        
+    }
 
-            GameObject newEnemy;
-            newEnemy = GameObject.Instantiate(enemy, new Vector3(UnityEngine.Random.Range(-7.5f,7.5f),10f,0f),Quaternion.identity);
-            newEnemy.name = "Enemy n°" + nbEnemies;
-            newEnemy.GetComponent<Enemies>().SetColor(hairColor);
-            newEnemy.transform.parent = transform; //set spawner as parent
+    void SpawnEnemy()
+    {
+        GameObject newEnemy;
+        newEnemy = Instantiate(enemyPrefab, spawnRange, Quaternion.identity);
+        newEnemy.name = "Enemy n°" + nbEnemies;
+        newEnemy.transform.parent = transform; //set spawner as parent
+        SetHairColor(newEnemy.GetComponent<Enemy>());
+    }
 
-            if (nbWave >= 14)
-            {
-                initTimerEnemy = 0.25f;
-            }
+    public void SetHairColor(Enemy enemy)
+    {
+        if (Random.Range(1, 3) == 1)
+            enemy.hairColor = Character.HairColor.Blond;
 
-        }//générer vague
+        else if (Random.Range(1, 3) == 2)
+            enemy.hairColor = Character.HairColor.Brown;
 
-        else if (wave)
-        {
-            wave = false;
-            if (numberEnemiesThisWave+1 <= maxNumberEnemy) {
-                numberEnemiesThisWave += moreNmiEachWave;
-            }
-        } //fin vague
+        else
+            enemy.hairColor = Character.HairColor.Black;
 
+        enemy.spriteRenderer.sprite = enemy.spriteList.First(sprite => sprite.hairColor == enemy.hairColor).sprite;
+
+        enemy.animator.SetTrigger(enemy.hairColor.ToString());
     }
 
 }

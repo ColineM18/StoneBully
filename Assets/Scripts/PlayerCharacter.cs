@@ -1,36 +1,54 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEngine.UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerCharacter : Character
 {
-    public Text lifeText;
-    public Text nbMunitions;
-    public PauseManager pauseMenu;
+    public Camera mainCamera;
+    public Vector3 mouseDirection
+    {
+        get
+        {
+            Vector3 inputPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z);
+            return mainCamera.ScreenToWorldPoint(inputPosition) - transform.position;
+        }
+    }
+    public bool shoot;
 
     void Start()
     {
         gameManager = GameManager.instance;
-        slingshot = gameManager.slingshot;
     }
 
     void Update()
     {
-        SlingshotOrientation();
-        Move();
-        Shoot(); // check shoot
-        lifeText.text = "Lifes : " + lifes.ToString();
-        nbMunitions.text = "Munitions : " + munitions + "/" + maxMunitions;
-        if (lifes <= 0)
+        if (!gameManager.pauseMenu.gamePaused)
         {
-            gameManager.EndGame();
+            OrientSlingshot();
+            Move();
+            Shoot(); // check shoot
+            gameManager.lifeText.text = "Lifes : " + lifes.ToString();
+            gameManager.nbMunitions.text = "Munitions : " + munitions + "/" + maxMunitions;
         }
     }
 
-    public override void PickUp()
+    public override void Shoot()
     {
-        base.PickUp();
+        //shoot in mouse direction
+        shootDirection = mouseDirection;
+
+        if (Input.GetMouseButtonDown(0) && munitions > 0)
+        {
+            //if enough munition, throw stone
+            munitions -= 1;
+
+            Stone stoneThrown;
+            stoneThrown = Instantiate(stone, slingshot.position, Quaternion.identity).GetComponent<Stone>();
+            stoneThrown.Throw(shootDirection, CharacterType.Player);
+
+            animator.SetTrigger("Shoot");
+            SoundManager.PlaySound("Fire");
+        }
+
     }
 
     public override void TakeDamages()
@@ -41,42 +59,10 @@ public class PlayerCharacter : Character
             SoundManager.PlaySound("PlayerHit");
             animator.SetTrigger("Hit");
         }
+        else
+            gameManager.EndGame();
     }
 
-    public override void Shoot()
-    {
-        if (!pauseMenu.gamePaused) //empecher tir
-        {
-            //shoot in mouse direction
-            mouseDirection = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));
-            mouseDirection -= transform.position;
-            shootDirection = mouseDirection;
-            
-
-            if (Input.GetMouseButtonDown(0) && !shoot && munitions > 0)
-            {
-                //si assez de munitions, lancer caillou
-                Stone stoneThrown;
-
-                stoneThrown = Instantiate(stone, transform.GetChild(0).transform.position, Quaternion.identity).GetComponent<Stone>();
-                stoneThrown.Throw(new Vector3(shootDirection.x * Time.deltaTime, shootDirection.y * Time.deltaTime, 0), thrower);
-                stoneThrown.transform.parent = gameManager.transform;
-                gameManager.stonesList.Add(stoneThrown);
-
-                //shoot
-                munitions -= 1;
-                animator.SetTrigger("Shoot");
-                SoundManager.PlaySound("Fire");
-                shoot = true;
-            }
-            else
-            {
-                shoot = false;
-            }
-        }
-    }
-
-    //player move
     public override void Move()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
@@ -84,11 +70,5 @@ public class PlayerCharacter : Character
 
         Vector3 velocity = new Vector3(horizontal, vertical, 0f).normalized * Time.deltaTime * speed;
         transform.position += velocity;
-    }
-
-    public override void SlingshotOrientation()
-    {
-        if (!pauseMenu.gamePaused)
-            base.SlingshotOrientation();
     }
 }

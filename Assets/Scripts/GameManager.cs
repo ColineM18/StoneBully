@@ -1,27 +1,31 @@
-﻿using System.Collections;
+﻿using UnityEngine.SceneManagement;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-
+using UnityEngine;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    public int score = 0;
-    public GameObject defeat;
-    public GameObject replayBouton;
-    public Text endScore;
-    public string mapToLoad;
-    public float replayTimer;
-    public PauseManager pause;
-    public List<Stone> stonesList = new List<Stone>();
     public GameObject limits;
     public PlayerCharacter player;
     public Spawn spawn;
-    public Transform slingshot;
-    public int lengthEnemies;
+
+    public int score;
+    public int enemiesCount;
+    public string mapToLoad;
+    public float replayTimer;
+
+    [Header("UI")]
+    public Text lifeText;
+    public Text nbMunitions;
+    public PauseManager pauseMenu;
+    public GameObject defeat;
+    public GameObject replayBouton;
+    public Text endScore;
     
+    public List<Stone> stonesList = new List<Stone>();
+
     void Awake()
     {
         #region  singleton
@@ -39,32 +43,32 @@ public class GameManager : MonoBehaviour
         #endregion
     }
 
-    void Start()
-    {
-        Time.timeScale = 1; //éviter problème de reload
-    }
-
-    //End Panel
     public void EndGame()
     {
+        StartCoroutine(EndMenu());
+    }
+
+    public IEnumerator EndMenu()
+    {
+        //End Panel
         defeat.SetActive(true);
-        ///endScore.text = "Félicitation, vous avez éliminé " + score.ToString() + " ennemis.";
-        endScore.text = "Congratulations, you eliminated "+ score.ToString () +" enemies. ";
-        pause.gamePaused = true;
+        endScore.text = "Congratulations, you eliminated " + score.ToString() + " enemies. ";
+
+        pauseMenu.gamePaused = true;
         Time.timeScale = 0;
-        replayTimer -= Time.fixedDeltaTime;
+
+        yield return new WaitForSecondsRealtime(replayTimer);
         
-        if (replayTimer <= 0)
-        {
-            replayBouton.SetActive(true);
-        }
+        replayBouton.SetActive(true);
     }
 
     //Reload
     public void Replay()
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene(mapToLoad);
         Destroy(gameObject);
     }
+
 
 }

@@ -131,24 +131,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
+  mainCamera: {fileID: 0}
+  animator: {fileID: 2368271093311350383}
   stone: {fileID: 5683532024523274026, guid: 3666d9b0d60bf3c4aad4ddb79c688ca6, type: 3}
-  distance: 0
+  hairColor: 3
+  lifes: 6
   munitions: 3
   maxMunitions: 3
-  lifes: 6
-  thrower: player
-  mainCamera: {fileID: 0}
-  player: {fileID: 418128595352531668}
-  speed: 7.9
-  mouseDirection: {x: 0, y: 0, z: 0}
-  shootDirection: {x: 0, y: 0, z: 0}
-  shoot: 0
   slingshot: {fileID: 162220588}
-  startSlingshot: {fileID: 162220587}
-  animator: {fileID: 0}
-  lifeText: {fileID: 0}
-  nbMunitions: {fileID: 0}
-  pauseMenu: {fileID: 0}
+  speed: 7.9
+  shoot: 0
 --- !u!95 &2368271093311350383
 Animator:
   serializedVersion: 3

@@ -1,32 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Stone : MonoBehaviour
 {
-    public bool collectable = false;
-    public string thrower;
+    private GameManager gameManager => GameManager.instance;
+    public bool collectable;
+    public Character.CharacterType thrower;
     public float speed;
     private Vector3 direction;
-    public GameManager gameManager;
-    public float sDistance; //distance avant arrêt
     public Vector3 enemyPosition;
-    public float nDistance; //distance entre caillou et ennemi
-
-    void Start()
-    {
-        collectable = false;
-        gameManager = GameManager.instance;
-
-    }
+    public float stopDistance; //distance avant arrêt 
+    public float separationDistance => Vector3.Distance(enemyPosition, transform.position);
 
     private void Update()
     {
-        nDistance = Vector3.Distance(enemyPosition, transform.position);
-
         if (!collectable)
         {
-            if (thrower == "player" || sDistance >= nDistance)
+            if (thrower == Character.CharacterType.Player || stopDistance >= separationDistance)
                 transform.position += direction.normalized * speed * Time.deltaTime;
             else
                 collectable = true;
@@ -56,7 +45,7 @@ public class Stone : MonoBehaviour
                 }
                 if (col.gameObject.name.Contains("Enemy") && child.munitions < child.maxMunitions)
                 {
-                    col.gameObject.GetComponent<Enemies>().PickUp();
+                    col.gameObject.GetComponent<Enemy>().PickUp();
                     gameManager.stonesList.Remove(gameObject.GetComponent<Stone>());
                     GameObject.Destroy(gameObject);
                 }
@@ -65,14 +54,14 @@ public class Stone : MonoBehaviour
             else if (!collectable)
             {
                 //dégâts
-                if (col.gameObject.tag == "Player" && thrower != "player")
+                if (col.gameObject.tag == "Player" && thrower == Character.CharacterType.Enemy)
                 {
                     col.gameObject.GetComponent<PlayerCharacter>().TakeDamages();
                     collectable = true;
                 }
-                if (col.gameObject.tag == "enemy" && thrower != "enemy")
+                if (col.gameObject.tag == "enemy" && thrower == Character.CharacterType.Player)
                 {
-                    col.gameObject.GetComponent<Enemies>().TakeDamages();
+                    col.gameObject.GetComponent<Enemy>().TakeDamages();
                     collectable = true;
                     gameManager.score += 1;
                 }
@@ -85,16 +74,18 @@ public class Stone : MonoBehaviour
         }   
     }
 
-    public void Throw(Vector3 dir, string currentThrower)
+    public void Throw(Vector3 dir, Character.CharacterType currentThrower)
     {
-        direction = dir;
+        direction = new Vector3(dir.x * Time.deltaTime, dir.y * Time.deltaTime, 0);
         thrower = currentThrower;
-  
+        transform.parent = gameManager.transform;
+        gameManager.stonesList.Add(this);
     }
 
-    public void StopDistance(float didi, Vector3 nmiP)
+    public void StopDistance(float distance, Vector3 enemyPosition)
     {
-        sDistance = Random.Range(didi, 15f);
-        enemyPosition = nmiP;
+        //stop enemies stones after an amount of time, because it does not stop, compared to player's stone whose aim for the mouse position
+        stopDistance = Random.Range(distance, 15f);
+        this.enemyPosition = enemyPosition;
     }
 }

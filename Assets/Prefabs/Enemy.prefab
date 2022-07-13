@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -5831507006508323766}
   - component: {fileID: 26637147}
   m_Layer: 0
-  m_Name: Enemies
+  m_Name: Enemy
   m_TagString: enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -99,36 +99,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
+  animator: {fileID: 26637147}
   stone: {fileID: 5683532024523274026, guid: 3666d9b0d60bf3c4aad4ddb79c688ca6, type: 3}
-  distance: 0
+  hairColor: 2
+  lifes: 1
   munitions: 2
   maxMunitions: 3
-  lifes: 0
-  thrower: enemy
-  mainCamera: {fileID: 0}
-  player: {fileID: 0}
+  slingshot: {fileID: 4790844789646403277}
   speed: 5
-  mouseDirection: {x: 0, y: 0, z: 0}
-  shootDirection: {x: 0, y: 0, z: 0}
-  shoot: 0
-  slingshot: {fileID: 0}
-  startSlingshot: {fileID: 0}
-  animator: {fileID: 26637147}
-  couleur: 
   spriteRenderer: {fileID: 3265311470593499495}
-  brun: {fileID: -6442977408137642798, guid: 3f66dcdebb61c5c44b458d1e000ff28f, type: 3}
-  blond: {fileID: 1779268675787235618, guid: 3f66dcdebb61c5c44b458d1e000ff28f, type: 3}
-  noir: {fileID: 329354556504525382, guid: 3f66dcdebb61c5c44b458d1e000ff28f, type: 3}
-  moving: 1
-  limits: {fileID: 0}
-  spawn: {fileID: 0}
-  stonePos: {x: 0, y: 0, z: 0}
-  isSeeking: 0
+  spriteList:
+  - hairColor: 2
+    sprite: {fileID: 1779268675787235618, guid: 3f66dcdebb61c5c44b458d1e000ff28f,
+      type: 3}
+  - hairColor: 1
+    sprite: {fileID: -6442977408137642798, guid: 3f66dcdebb61c5c44b458d1e000ff28f,
+      type: 3}
+  - hairColor: 0
+    sprite: {fileID: 329354556504525382, guid: 3f66dcdebb61c5c44b458d1e000ff28f, type: 3}
   timerShoot: 0
-  initTimer: 6
-  timerAttack: 0
-  startPosition: {x: 0, y: 0, z: 0}
-  startTime: 0
+  timerCloseAttack: 0
+  isSeekingStone: 0
 --- !u!60 &-5831507006508323766
 PolygonCollider2D:
   m_ObjectHideFlags: 0

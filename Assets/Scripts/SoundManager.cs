@@ -1,15 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
-
     public static AudioClip[] FireSoundsPlayer = new AudioClip[2];
     public static AudioClip DamagesoundPlayer, Collectablesound, DamageSoundsEnemy, ElasticSound;
     static AudioSource audioSrc;
 
-    // Start is called before the first frame update
     void Start()
     {
         ElasticSound = Resources.Load<AudioClip>("ElasticPlayer");
