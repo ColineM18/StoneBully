@@ -72,7 +72,7 @@ public class UIManager : MonoBehaviour
     public void Defeat(int score)
     {
         defeatScreen.gameObject.SetActive(true);
-        endScoreTMP.text = "Congratulations, <br> you eliminated " + score.ToString() + " enemies. ";
+        endScoreTMP.text = "Congratulations, <br> you eliminated " + score.ToString() + " enemies.";
     }
 
     public void ShowReplayButton()
