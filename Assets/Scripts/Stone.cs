@@ -2,7 +2,7 @@
 
 public class Stone : MonoBehaviour
 {
-    private GameManager gameManager => GameManager.instance;
+    private GameManager gameManager;
     public bool collectable;
     public Character.CharacterType thrower;
     public float speed;
@@ -35,7 +35,7 @@ public class Stone : MonoBehaviour
             if (collectable)
             {
                 //ramassé
-                if (col.gameObject.name == "Player" && child.munitions < child.maxMunitions)
+                if (col.gameObject.name == "Player" && child.munitions < gameManager.maxMunitions)
                 {
                     SoundManager.PlaySound("PickStone");
                     col.gameObject.GetComponent<PlayerCharacter>().PickUp();
@@ -43,7 +43,7 @@ public class Stone : MonoBehaviour
                     GameObject.Destroy(gameObject);
 
                 }
-                if (col.gameObject.name.Contains("Enemy") && child.munitions < child.maxMunitions)
+                if (col.gameObject.name.Contains("Enemy") && child.munitions < gameManager.maxMunitions)
                 {
                     col.gameObject.GetComponent<Enemy>().PickUp();
                     gameManager.stonesList.Remove(gameObject.GetComponent<Stone>());
@@ -78,6 +78,7 @@ public class Stone : MonoBehaviour
     {
         direction = new Vector3(dir.x * Time.deltaTime, dir.y * Time.deltaTime, 0);
         thrower = currentThrower;
+        gameManager = GameManager.instance;
         transform.parent = gameManager.transform;
         gameManager.stonesList.Add(this);
     }

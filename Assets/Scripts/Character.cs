@@ -3,15 +3,16 @@
 public class Character : MonoBehaviour
 {   
     [Header("General")]
-    public GameManager gameManager;
+    protected GameManager gameManager;
+    [HideInInspector]
     public Animator animator;
     public GameObject stone;
 
     [Header("Characters infos")]
     public HairColor hairColor;
     public int lifes;
+    protected int maxMunitions => gameManager.maxMunitions;
     public int munitions;
-    public int maxMunitions;
 
     [Header("Slingshot infos")]
     public Transform slingshot;
@@ -43,5 +44,10 @@ public class Character : MonoBehaviour
         Enemy
     }
 
+    protected virtual void Start()
+    {
+        gameManager = GameManager.instance;
+        animator = GetComponent<Animator>();
+    }
 
 }

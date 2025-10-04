@@ -12,7 +12,7 @@ public class Enemy : Character
 
     private Spawn spawn => gameManager.spawn;
     private GameObject spawnLimits => gameManager.limits; //spawn limits
-    private int nbWave => spawn.nbWave; //apparition wave
+    public int nbWave; //apparition wave
 
     //seek & shoot timers
     public float timerShoot;
@@ -29,11 +29,12 @@ public class Enemy : Character
     private Vector3 startPositionToSeek;
     private float distanceWithStone => Vector3.Distance(startPositionToSeek, stonePos.Value);
 
-    
-    void Start()
+
+    protected override void Start()
     {
+        base.Start();
+
         timerShoot = UnityEngine.Random.Range(1f, initTimer); //strat shooting at a random moment
-        gameManager = GameManager.instance;
 
         if (nbWave >= 3)
             munitions = 1; // it makes them more dynamic
@@ -100,8 +101,8 @@ public class Enemy : Character
                 isSeekingStone = true;
             }
 
-            float interpolation = ((Time.time - startStoneQuestTime) * speed) / distanceWithStone;
-            transform.position = Vector3.Lerp(startPositionToSeek, stonePos.Value, interpolation);
+            Vector3 direction = (stonePos.Value - transform.position).normalized;
+            transform.position += direction * speed * Time.deltaTime;
         }
     }
     public GameObject FindClosestStone()

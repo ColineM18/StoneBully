@@ -7,24 +7,23 @@ using System.Collections;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public UIManager ui;
     public GameObject limits;
     public PlayerCharacter player;
     public Spawn spawn;
 
+    public int nbWavesBetweenNewLife;
+    public int maxMunitions;
     public int score;
+
     public int enemiesCount;
     public string mapToLoad;
     public float replayTimer;
 
-    [Header("UI")]
-    public Text lifeText;
-    public Text nbMunitions;
-    public PauseManager pauseMenu;
-    public GameObject defeat;
-    public GameObject replayBouton;
-    public Text endScore;
+    public bool gamePaused;
     
     public List<Stone> stonesList = new List<Stone>();
+    
 
     void Awake()
     {
@@ -51,15 +50,13 @@ public class GameManager : MonoBehaviour
     public IEnumerator EndMenu()
     {
         //End Panel
-        defeat.SetActive(true);
-        endScore.text = "Congratulations, you eliminated " + score.ToString() + " enemies. ";
-
-        pauseMenu.gamePaused = true;
         Time.timeScale = 0;
+        gamePaused = true;
+        ui.Defeat(score);
 
         yield return new WaitForSecondsRealtime(replayTimer);
-        
-        replayBouton.SetActive(true);
+
+        ui.ShowReplayButton();
     }
 
     //Reload

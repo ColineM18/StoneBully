@@ -3,36 +3,50 @@ using UnityEngine;
 using System.Linq;
 
 public class Spawn : MonoBehaviour
-{
-    public GameManager gameManager;
+{ 
+    [HideInInspector]
     public GameObject enemyPrefab;
+    [HideInInspector]
     public GameObject player;
-    public Text waveTxt;
 
-    private Vector3 spawnRange => new Vector3(Random.Range(-7.5f, 7.5f), 10f, 0f);
+    public Transform spawnBorderL;
+    public Transform spawnBorderR;
 
+    public UIManager ui;
+
+    [Header("Settings")]
     public int maxNumberEnemy; //global
-    public int nbWavesBetweenNewLife;
-    private int nbWavesBeforeNewLife = 1;
-
-    private float spawnTimeFrequency = 1f;
-    private float spawnTime;
-
+    public int enemyCount;
     public int nbEnemiesToAddEachTurn;
-    public int numberEnemiesThisWave;
-    public int nbWave;
-    private int nbEnemies;
-        
-    public float initTimeBetweenWaves;
-    private float timeBetweenWaves;
 
-    public bool waveStarted;
+    public float timeBetweenWaves;
+
+    [SerializeField]
+    private float spawnTimeEnnemy = 1f; 
+
+    GameManager gameManager;
+
+    [Header("Monitor")]
+    [SerializeField]
+    bool waveStarted;
+    [SerializeField]
+    int nbWave;
+    [SerializeField]
+    int numberEnemiesThisWave;
+    [SerializeField]
+    private float spawnTime;
+    [SerializeField]
+    int nbEnemies;
+    float timeRemainingBeforeNextWave;
+    int nbWavesBeforeNewLife;
 
     void Start()
     {
-        spawnTime = spawnTimeFrequency;    //frequency
-        timeBetweenWaves = initTimeBetweenWaves;
+        spawnTime = spawnTimeEnnemy;    //frequency
+        timeRemainingBeforeNextWave = timeBetweenWaves;
+        numberEnemiesThisWave = enemyCount;
         gameManager = GameManager.instance;
+        nbWavesBeforeNewLife = gameManager.nbWavesBetweenNewLife+1;
     }
 
     void Update()
@@ -46,29 +60,24 @@ public class Spawn : MonoBehaviour
 
     public void StartWave()
     {
-        timeBetweenWaves -= Time.deltaTime; //delay
+        timeRemainingBeforeNextWave -= Time.deltaTime; //delay
 
-        if (timeBetweenWaves <= 0)
+        if (timeRemainingBeforeNextWave <= 0)
         {
             // Next wave ready
-            waveTxt.text = "Wave : " + nbWave;
+            ui.SetWave(nbWave);
 
             waveStarted = true;
             nbEnemies = 0;
             nbWave++;
-            nbWavesBeforeNewLife++;   
-            timeBetweenWaves = initTimeBetweenWaves; //reset delay
+             
+            timeRemainingBeforeNextWave = timeBetweenWaves; //reset delay
 
-            Heal();
-        }
-    }
-    public void Heal()
-    {
-        if (nbWavesBeforeNewLife == nbWavesBetweenNewLife)
-        {
-            //get a bonus life every 5 levels
-            gameManager.player.lifes += 1;
-            nbWavesBeforeNewLife = 0;
+            if (nbWavesBeforeNewLife == 0)
+            {
+                Heal();
+            }
+            nbWavesBeforeNewLife--;
         }
     }
 
@@ -80,7 +89,7 @@ public class Spawn : MonoBehaviour
         {
             if(nbEnemies < numberEnemiesThisWave)
             {
-                spawnTime = spawnTimeFrequency;
+                spawnTime = spawnTimeEnnemy;
 
                 nbEnemies++;
                 gameManager.enemiesCount++;
@@ -88,7 +97,7 @@ public class Spawn : MonoBehaviour
                 SpawnEnemy();
 
                 if (nbWave >= 14)
-                    spawnTimeFrequency = 0.25f; //increase difficulty
+                    spawnTimeEnnemy = 0.25f; //increase difficulty
             }
             else //end wave
             {
@@ -101,13 +110,23 @@ public class Spawn : MonoBehaviour
         
     }
 
+    public void Heal()
+    {
+        //get a bonus life every 5 levels
+        gameManager.player.Heal();
+        nbWavesBeforeNewLife = gameManager.nbWavesBetweenNewLife;
+    }
+
     void SpawnEnemy()
     {
-        GameObject newEnemy;
-        newEnemy = Instantiate(enemyPrefab, spawnRange, Quaternion.identity);
+        Enemy newEnemy;
+        Vector3 spawnRange = new Vector3(Random.Range(spawnBorderL.position.x, spawnBorderR.position.x), transform.position.y, 0f);
+        newEnemy = Instantiate(enemyPrefab, spawnRange, Quaternion.identity).GetComponent<Enemy>();
         newEnemy.name = "Enemy n°" + nbEnemies;
         newEnemy.transform.parent = transform; //set spawner as parent
-        SetHairColor(newEnemy.GetComponent<Enemy>());
+        newEnemy.nbWave = nbWave;
+        SetHairColor(newEnemy);
+        
     }
 
     public void SetHairColor(Enemy enemy)

@@ -12,20 +12,23 @@ public class PauseManager : MonoBehaviour
     {
         if (Input.GetButtonDown("Cancel"))
         {
-            //manage panel
-            if(gamePaused == false)
-            {
-                Time.timeScale = 0;
-                gamePaused = true;
-                pauseMenu.SetActive(true);
-            }
-            else
-            {
-                pauseMenu.SetActive(false);
-                gamePaused = false;
-                Time.timeScale = 1;
-            }
+            Pause();
+        }
+    }
 
+    public void Pause()
+    {
+        if (gamePaused == false)
+        {
+            Time.timeScale = 0;
+            gamePaused = true;
+            pauseMenu.SetActive(true);
+        }
+        else
+        {
+            pauseMenu.SetActive(false);
+            gamePaused = false;
+            Time.timeScale = 1;
         }
     }
 
